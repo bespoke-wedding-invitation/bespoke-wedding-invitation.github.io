@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="./assets/music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Music Control -->
+    <div class="music-control" id="musicControl" onclick="toggleMusic()">🎵</div>
+
+    <!-- Cover Page -->
+    <div class="cover-page" id="coverPage">
+        <div class="cover-content">
+            <div class="cover-title">Together</div>
+            <div class="cover-subtitle">We Invite You To</div>
+            <div class="cover-text">A Celebration of Love & Union</div>
+            <button class="open-btn" onclick="openInvitation()">Open Invitation</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        
+        <!-- Section 1: Wedding Announcement -->
+        <section class="section hero-section">
+            <div class="section-overlay"></div>
+            <div class="section-content">
+                <h1 class="hero-title">We're Getting Married!</h1>
+                <div class="couple-names">
+                    <span id="groomName">Groom Name</span>
+                    <span class="ampersand">&</span>
+                    <span id="brideName">Bride Name</span>
+                </div>
+                <div class="scroll-hint">↓ Scroll to continue ↓</div>
+            </div>
+        </section>
+
+        <!-- Section 2: Event Details -->
+        <section class="section details-section">
+            <div class="section-overlay"></div>
+            <div class="section-content">
+                <div class="detail-card">
+                    <div class="detail-label">📅 Date</div>
+                    <div class="detail-value" id="eventDate">January 15, 2025</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">🕐 Time</div>
+                    <div class="detail-value" id="eventTime">4:00 PM - 11:00 PM</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">📍 Venue</div>
+                    <div class="detail-value" id="eventVenue">Grand Ballroom, City Name</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Our Story - Part 1 -->
+        <section class="section story-section-1">
+            <div class="section-overlay"></div>
+            <div class="section-content">
+                <div class="story-badge">Our Journey</div>
+                <h2 class="story-title">How We Met</h2>
+                <p class="story-text">
+                    In that first moment, something magical happened. Your smile, your presence—everything felt right. What started as a chance encounter became the greatest journey of our lives.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 4: Our Story - Part 2 -->
+        <section class="section story-section-2">
+            <div class="section-overlay"></div>
+            <div class="section-content">
+                <div class="story-badge">Forever Begins</div>
+                <h2 class="story-title">The Promise</h2>
+                <p class="story-text">
+                    Through countless adventures and quiet moments, we discovered that life is infinitely more beautiful when shared. Today marks the beginning of forever. Thank you for being part of our journey.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 5: RSVP -->
+        <section class="section rsvp-section">
+            <div class="section-content">
+                <h2 class="rsvp-title">Join Our Celebration</h2>
+                <p class="rsvp-subtitle">Your presence is the greatest gift we could ask for</p>
+                
+                <form class="rsvp-form" onsubmit="submitRSVP(event)">
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="guestName" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select" id="guestAttendance" required>
+                            <option value="">Will you attend?</option>
+                            <option value="Yes">Yes, I'll be there! ✨</option>
+                            <option value="No">Sorry, can't attend 😢</option>
+                            <option value="Maybe">Maybe</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-input" id="guestEmail" placeholder="Your Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" class="form-input" id="guestPhone" placeholder="Your Phone Number (optional)">
+                    </div>
+                    <button type="submit" class="submit-btn">Submit RSVP</button>
+                </form>
+
+                <button class="share-btn" onclick="shareInvite()">Share Invitation</button>
+                
+                <p class="footer-text">Looking forward to celebrating with you! 💕</p>
+            </div>
+        </section>
+        <script src="./index.js"></script>
+    </div>
+</body>
+</html>
