@@ -38,7 +38,7 @@ function openInvitation() {
             console.log('Autoplay prevented:', err);
             musicControl.textContent = '🔇';
         });
-    }, 400);
+    }, 100);
 
     // Load data from Google Sheets (if configured)
     loadInvitationData();
