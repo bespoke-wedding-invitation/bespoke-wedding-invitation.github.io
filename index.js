@@ -1,7 +1,7 @@
 // Configuration
 const CONFIG = {
-    SHEET_ID: 'YOUR_GOOGLE_SHEET_ID_HERE',
-    API_KEY: 'YOUR_GOOGLE_API_KEY_HERE'
+    SHEET_ID: '1seZkg6XZfHTpnSWmQhmJtmugtkJ5BrJ9pnoLuxU9TmM',
+    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzy23w1QXdTcTWebLEqfq7zcr6NMpkmd3BApSQQWSuOGXvbVXZaD-cRMZ_TUq3LHsFJDA/exec'
 };
 
 // Music Control
@@ -76,18 +76,42 @@ async function loadInvitationData() {
 }
 
 // Submit RSVP
-function submitRSVP(event) {
+async function submitRSVP(event) {
     event.preventDefault();
     
     const name = document.getElementById('guestName').value;
     const attendance = document.getElementById('guestAttendance').value;
-    const email = document.getElementById('guestEmail').value;
-    const phone = document.getElementById('guestPhone').value;
+    const pax = document.getElementById('guestPax').value;
 
-    // You can send this to Google Sheets or your backend
-    alert(`Thank you ${name}! Your RSVP has been recorded.\n\nAttendance: ${attendance}`);
+    try {
+        // Send to Google Sheets
+        await sendToGoogleSheets(name, attendance, pax);
+        alert(`Thank you ${name}! Your RSVP has been recorded.\n\nAttendance: ${attendance}\nGuests: ${pax}`);
+        event.target.reset();
+    } catch (error) {
+        console.error('Error submitting RSVP:', error);
+        alert('There was an error submitting your RSVP. Please try again.');
+    }
+}
+
+// Send data to Google Sheets via Google Apps Script
+async function sendToGoogleSheets(name, attendance, pax) {
+    const requestBody = {
+        name: name,
+        attendance: attendance,
+        pax: pax
+    };
     
-    event.target.reset();
+    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(requestBody)
+    });
+    
+    if (!response.ok) {
+        throw new Error(`Failed to submit RSVP: ${response.statusText}`);
+    }
+    
+    return response.json();
 }
 
 // Share Invitation
