@@ -4,10 +4,122 @@ const CONFIG = {
     APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzy23w1QXdTcTWebLEqfq7zcr6NMpkmd3BApSQQWSuOGXvbVXZaD-cRMZ_TUq3LHsFJDA/exec'
 };
 
+// Guest data from URL
+let currentGuest = null;
+let isLoadingGuest = false;
+
 // Music Control
 const bgMusic = document.getElementById('bgMusic');
 const musicControl = document.getElementById('musicControl');
 let isMusicPlaying = false;
+
+// Parse guest name from URL on page load
+function initializeGuest() {
+    let guestId = null;
+    
+    // Try hash-based routing: /#/aaron
+    if (window.location.hash) {
+        guestId = window.location.hash.replace('#/', '').split('?')[0].trim();
+    }
+    
+    // Try query parameter: ?guest=aaron
+    if (!guestId) {
+        const params = new URLSearchParams(window.location.search);
+        guestId = params.get('guest');
+    }
+    
+    if (guestId) {
+        // URL parameter detected (e.g., /#/aaron or ?guest=aaron)
+        loadGuestData(guestId);
+    }
+}
+
+// Fetch guest data from Google Sheets via Apps Script
+async function loadGuestData(guestIdParam) {
+    isLoadingGuest = true;
+    disableForm(true);
+    
+    try {
+        console.log('Loading guest data for:', guestIdParam);
+        
+        // Use Apps Script to fetch guest data
+        const requestBody = {
+            action: 'getGuestData',
+            id: guestIdParam
+        };
+        
+        console.log('Sending request to Apps Script:', requestBody);
+        
+        const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(requestBody)
+        });
+        
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (data && data.found) {
+            currentGuest = {
+                id: guestIdParam,
+                name: data.name,
+                allowedPax: parseInt(data.allowedPax) || 0
+            };
+            console.log('Guest loaded successfully:', currentGuest);
+        } else {
+            console.log('Guest not found in sheet');
+        }
+    } catch (error) {
+        console.error('Error loading guest data:', error);
+    } finally {
+        isLoadingGuest = false;
+        disableForm(false);
+        updateGuestName();
+        updatePaxOptions();
+    }
+}
+
+// Update PAX options based on guest's allowed PAX
+function updatePaxOptions() {
+    const paxSelect = document.getElementById('guestPax');
+    
+    if (currentGuest && currentGuest.allowedPax > 0) {
+        // Clear existing options except the placeholder
+        paxSelect.innerHTML = '<option value="">Number of guests</option>';
+        
+        // Add options from 1 to allowedPax
+        for (let i = 1; i <= currentGuest.allowedPax; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            paxSelect.appendChild(option);
+        }
+    } else {
+        // Reset to placeholder only
+        paxSelect.innerHTML = '<option value="">Number of guests</option>';
+    }
+}
+
+// Update PAX options based on guest's allowed PAX
+function updateGuestName() {
+    const guestName = document.getElementById('guestName');
+    
+    if (currentGuest && currentGuest.allowedPax > 0) {
+        // Clear existing options except the placeholder
+        guestName.value = currentGuest.name;
+    }
+}
+
+// Disable/enable form during loading
+function disableForm(disabled) {
+    const form = document.querySelector('.rsvp-form');
+    if (form) {
+        const inputs = form.querySelectorAll('input, select, button[type="submit"]');
+        inputs.forEach(input => {
+            input.disabled = disabled;
+        });
+    }
+}
 
 function toggleMusic() {
     if (isMusicPlaying) {
@@ -30,6 +142,14 @@ function openInvitation() {
     
     setTimeout(() => {
         mainContent.classList.add('visible');
+        
+        // Prefill guest name if available
+        if (currentGuest) {
+            document.getElementById('guestName').value = currentGuest.name;
+            document.getElementById('guestName').readOnly = true;
+            updatePaxOptions();
+        }
+        
         // Try to play music
         bgMusic.play().then(() => {
             isMusicPlaying = true;
@@ -85,7 +205,7 @@ async function submitRSVP(event) {
 
     try {
         // Send to Google Sheets
-        await sendToGoogleSheets(name, attendance, pax);
+        await sendToGoogleSheets(currentGuest.id, name, attendance, pax);
         alert(`Thank you ${name}! Your RSVP has been recorded.\n\nAttendance: ${attendance}\nGuests: ${pax}`);
         event.target.reset();
     } catch (error) {
@@ -138,3 +258,8 @@ document.body.addEventListener('touchmove', function(e) {
         e.preventDefault();
     }
 }, { passive: false });
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializeGuest();
+});
