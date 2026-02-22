@@ -215,8 +215,9 @@ async function submitRSVP(event) {
 }
 
 // Send data to Google Sheets via Google Apps Script
-async function sendToGoogleSheets(name, attendance, pax) {
+async function sendToGoogleSheets(id, name, attendance, pax) {
     const requestBody = {
+        id: id,
         name: name,
         attendance: attendance,
         pax: pax
